@@ -64,18 +64,22 @@
     gsap.registerPlugin(ScrollTrigger);
     gsap.defaults({ ease: 'power3.out' });
 
-    /* Hero: headline slides up, copy fades in, then the mosaic builds tile by tile */
+    /* Hero: headline slides up, copy fades in, then the two rows of tiles rise in */
     gsap.timeline({ defaults: { ease: 'power4.out' } })
       .fromTo('h1 .line>span', { yPercent: 110, autoAlpha: 1 }, { yPercent: 0, duration: 1, stagger: 0.12 }, 0.05)
-      .fromTo('.rise', { y: 22, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.8, stagger: 0.1 }, 0.2)
-      .add(() => $('h1 em').classList.add('on'), 0.9)
-      .from('.mt', { autoAlpha: 0, y: 50, scale: 0.97, duration: 0.8, stagger: { each: 0.09, from: 'start' } }, 0.9)
-      .from('.mt__play', { scale: 0, duration: 0.6, ease: 'back.out(2)' }, 1.3)
-      .from('.mt__tags li', { autoAlpha: 0, y: 8, duration: 0.4, stagger: 0.08 }, 1.5)
-      .from('.week .on i', { scale: 0, duration: 0.4, stagger: 0.1, ease: 'back.out(2.4)' }, 1.5)
-      .from('.mbars i', { scaleY: 0, duration: 0.7, stagger: 0.07 }, 1.6)
-      .from('.mt__icons i', { scale: 0, duration: 0.45, stagger: 0.1, ease: 'back.out(2.4)' }, 1.6)
-      .from('.bub', { autoAlpha: 0, y: 10, duration: 0.5, stagger: 0.35 }, 1.8);
+      .fromTo('.hero__title .rise, .hero__side .rise', { y: 22, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.8, stagger: 0.1 }, 0.2)
+      .add(() => $('h1 em').classList.add('on'), 0.95)
+      .fromTo('.reel__row', { autoAlpha: 0, y: 60 }, { autoAlpha: 1, y: 0, duration: 1, stagger: 0.18 }, 0.7);
+
+    // the three facts count in as you reach them
+    ScrollTrigger.create({
+      trigger: '.facts', start: 'top 88%', once: true,
+      onEnter: () => {
+        gsap.fromTo('.facts', { y: 30, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.8 });
+        $$('.facts b').forEach(el => { const n = +el.textContent; const o = { v: 0 };
+          gsap.to(o, { v: n, duration: 1.2, ease: 'power2.out', onUpdate: () => { el.textContent = Math.round(o.v); } }); });
+      }
+    });
 
     /* Scroll reveals */
     ScrollTrigger.batch('.reveal', {
