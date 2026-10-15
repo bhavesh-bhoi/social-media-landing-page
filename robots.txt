@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://social.ainatech.in/sitemap.xml
