@@ -64,22 +64,63 @@
     gsap.registerPlugin(ScrollTrigger);
     gsap.defaults({ ease: 'power3.out' });
 
-    /* Hero: headline slides up, copy fades in, then the two rows of tiles rise in */
+    /* Hero: headline slides up, copy fades in, the stage pops in */
     gsap.timeline({ defaults: { ease: 'power4.out' } })
       .fromTo('h1 .line>span', { yPercent: 110, autoAlpha: 1 }, { yPercent: 0, duration: 1, stagger: 0.12 }, 0.05)
-      .fromTo('.hero__title .rise, .hero__side .rise', { y: 22, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.8, stagger: 0.1 }, 0.2)
-      .add(() => $('h1 em').classList.add('on'), 0.95)
-      .fromTo('.reel__row', { autoAlpha: 0, y: 60 }, { autoAlpha: 1, y: 0, duration: 1, stagger: 0.18 }, 0.7);
+      .fromTo('.hero__copy .rise', { y: 22, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.8, stagger: 0.1 }, 0.2)
+      .fromTo('.orbit', { autoAlpha: 0, scale: 0.85 }, { autoAlpha: 1, scale: 1, duration: 1, stagger: 0.15 }, 0.2)
+      .fromTo('.disc', { autoAlpha: 0, scale: 0.6, transformOrigin: '50% 50%' }, { autoAlpha: 1, scale: 1, duration: 0.9, ease: 'back.out(1.4)' }, 0.3)
+      .fromTo('.phone', { autoAlpha: 0, y: 80 }, { autoAlpha: 1, y: 0, duration: 1 }, 0.5)
+      .fromTo('.scard', { autoAlpha: 0, y: 40 }, { autoAlpha: 1, y: 0, duration: 0.8, stagger: 0.15 }, 1)
+      .add(startLoops, 1.4);
 
-    // the three facts count in as you reach them
-    ScrollTrigger.create({
-      trigger: '.facts', start: 'top 88%', once: true,
-      onEnter: () => {
-        gsap.fromTo('.facts', { y: 30, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.8 });
-        $$('.facts b').forEach(el => { const n = +el.textContent; const o = { v: 0 };
-          gsap.to(o, { v: n, duration: 1.2, ease: 'power2.out', onUpdate: () => { el.textContent = Math.round(o.v); } }); });
-      }
-    });
+    // headline word swap: seen. remembered. followed. chosen.
+    const words = $$('#swap .w');
+    if (words.length > 1) {
+      gsap.set(words, { yPercent: 115, autoAlpha: 0 });
+      gsap.set(words[0], { yPercent: 0, autoAlpha: 1 });
+      let wi = 0;
+      const swap = () => {
+        const cur = words[wi]; wi = (wi + 1) % words.length; const nx = words[wi];
+        gsap.timeline()
+          .to(cur, { yPercent: -115, autoAlpha: 0, duration: 0.55, ease: 'power3.in' })
+          .fromTo(nx, { yPercent: 115, autoAlpha: 0 }, { yPercent: 0, autoAlpha: 1, duration: 0.7, ease: 'power3.out' }, '-=0.1');
+        gsap.delayedCall(2.5, swap);
+      };
+      gsap.delayedCall(3.4, swap);
+    }
+
+    function startLoops() {
+      // notifications pop in one after another, forever
+      const toasts = $$('.toast');
+      const tt = gsap.timeline({ repeat: -1 });
+      toasts.forEach((t, i) => {
+        const at = i * 1.5;
+        tt.fromTo(t, { autoAlpha: 0, y: 18, scale: 0.9 }, { autoAlpha: 1, y: 0, scale: 1, duration: 0.55, ease: 'back.out(1.8)' }, at)
+          .to(t, { autoAlpha: 0, y: -12, duration: 0.4, ease: 'power2.in' }, at + 3);
+      });
+      tt.to({}, { duration: 0.6 });
+
+      // hearts float up from the phone, over and over
+      const hearts = $$('.hrt');
+      gsap.timeline({ repeat: -1, repeatDelay: 0.8, delay: 0.5 })
+        .fromTo(hearts, { y: 0, x: 0, opacity: 0, scale: 0.3 },
+          { y: i => -140 - i * 26, x: i => [-40, 10, 50, -20, 30, -55][i % 6], opacity: 1, scale: 1, duration: 1.3, stagger: 0.38, ease: 'power1.out' })
+        .to(hearts, { opacity: 0, duration: 0.5, stagger: 0.38 }, 0.9);
+
+      // report bars grow, hold, then drop and grow again
+      const bars = $$('.mb i');
+      gsap.timeline({ repeat: -1, repeatDelay: 1.6 })
+        .fromTo(bars, { scaleY: 0.08 }, { scaleY: 1, duration: 0.8, stagger: 0.1, ease: 'power3.out' })
+        .to({}, { duration: 1.6 })
+        .to(bars, { scaleY: 0.08, duration: 0.4, stagger: 0.04, ease: 'power2.in' });
+
+      // calendar days get ticked off one by one
+      const days = $$('.wk li');
+      const ct = gsap.timeline({ repeat: -1, repeatDelay: 1 });
+      days.forEach((d, i) => ct.add(() => d.classList.add('on'), i * 0.45).fromTo(d, { scale: 0.7 }, { scale: 1, duration: 0.4, ease: 'back.out(3)' }, i * 0.45));
+      ct.to({}, { duration: 1.4 }).add(() => days.forEach(d => d.classList.remove('on')));
+    }
 
     /* Scroll reveals */
     ScrollTrigger.batch('.reveal', {
