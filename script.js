@@ -64,18 +64,18 @@
     gsap.registerPlugin(ScrollTrigger);
     gsap.defaults({ ease: 'power3.out' });
 
-    /* Hero: headline slides up, copy fades in, then the composition builds */
+    /* Hero: headline slides up, copy fades in, then the mosaic builds tile by tile */
     gsap.timeline({ defaults: { ease: 'power4.out' } })
       .fromTo('h1 .line>span', { yPercent: 110, autoAlpha: 1 }, { yPercent: 0, duration: 1, stagger: 0.12 }, 0.05)
       .fromTo('.rise', { y: 22, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.8, stagger: 0.1 }, 0.2)
-      .add(() => $('h1 em').classList.add('on'), 1)
-      .from('.art__panel', { autoAlpha: 0, scale: 0.94, transformOrigin: '50% 60%', duration: 0.9 }, 0.2)
-      .from('.phone', { autoAlpha: 0, y: 60, duration: 0.9 }, 0.45)
-      .from('.pgrid i', { autoAlpha: 0, scale: 0.7, duration: 0.4, stagger: 0.04, ease: 'back.out(1.6)' }, 0.9)
-      .from('.acard--rep', { autoAlpha: 0, x: 40, duration: 0.8 }, 0.9)
-      .from('.acard--cal', { autoAlpha: 0, x: -40, duration: 0.8 }, 1.05)
-      .from('.mbars i', { scaleY: 0, duration: 0.7, stagger: 0.07, ease: 'power3.out' }, 1.3)
-      .from('.week .on i', { scale: 0, duration: 0.4, stagger: 0.1, ease: 'back.out(2.4)' }, 1.4);
+      .add(() => $('h1 em').classList.add('on'), 0.9)
+      .from('.mt', { autoAlpha: 0, y: 50, scale: 0.97, duration: 0.8, stagger: { each: 0.09, from: 'start' } }, 0.9)
+      .from('.mt__play', { scale: 0, duration: 0.6, ease: 'back.out(2)' }, 1.3)
+      .from('.mt__tags li', { autoAlpha: 0, y: 8, duration: 0.4, stagger: 0.08 }, 1.5)
+      .from('.week .on i', { scale: 0, duration: 0.4, stagger: 0.1, ease: 'back.out(2.4)' }, 1.5)
+      .from('.mbars i', { scaleY: 0, duration: 0.7, stagger: 0.07 }, 1.6)
+      .from('.mt__icons i', { scale: 0, duration: 0.45, stagger: 0.1, ease: 'back.out(2.4)' }, 1.6)
+      .from('.bub', { autoAlpha: 0, y: 10, duration: 0.5, stagger: 0.35 }, 1.8);
 
     /* Scroll reveals */
     ScrollTrigger.batch('.reveal', {
